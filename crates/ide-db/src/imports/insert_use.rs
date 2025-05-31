@@ -5,6 +5,7 @@ mod tests;
 use std::cmp::Ordering;
 
 use hir::Semantics;
+use span::Edition;
 use syntax::{
     Direction, NodeOrToken, SyntaxKind, SyntaxNode, algo,
     ast::{
@@ -150,9 +151,14 @@ pub fn insert_use(scope: &ImportScope, path: ast::Path, cfg: &InsertUseConfig) {
     insert_use_with_alias_option(scope, path, cfg, None);
 }
 
-pub fn insert_use_as_alias(scope: &ImportScope, path: ast::Path, cfg: &InsertUseConfig) {
+pub fn insert_use_as_alias(
+    scope: &ImportScope,
+    path: ast::Path,
+    cfg: &InsertUseConfig,
+    edition: Edition,
+) {
     let text: &str = "use foo as _";
-    let parse = syntax::SourceFile::parse(text, span::Edition::CURRENT_FIXME);
+    let parse = syntax::SourceFile::parse(text, edition);
     let node = parse
         .tree()
         .syntax()
