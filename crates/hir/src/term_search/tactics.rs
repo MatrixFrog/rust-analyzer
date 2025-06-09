@@ -15,7 +15,6 @@ use hir_ty::db::HirDatabase;
 use hir_ty::mir::BorrowKind;
 use itertools::Itertools;
 use rustc_hash::FxHashSet;
-use span::Edition;
 
 use crate::{
     Adt, AssocItem, GenericDef, GenericParam, HasAttrs, HasVisibility, Impl, ModuleDef, ScopeDef,
@@ -364,9 +363,10 @@ pub(super) fn free_function<'a, DB: HirDatabase>(
                             .collect::<Option<_>>()?;
 
                         let ret_ty = it.ret_type_with_args(db, generics.iter().cloned());
+                        let edition = module.definition_source_file_id(db).edition(db);
                         // Filter out private and unsafe functions
                         if !it.is_visible_from(db, module)
-                            || it.is_unsafe_to_call(db, None, Edition::CURRENT_FIXME)
+                            || it.is_unsafe_to_call(db, None, edition)
                             || it.is_unstable(db)
                             || ctx.config.enable_borrowcheck && ret_ty.contains_reference(db)
                             || ret_ty.is_raw_ptr()
@@ -470,9 +470,10 @@ pub(super) fn impl_method<'a, DB: HirDatabase>(
                 return None;
             }
 
+            let edition = module.definition_source_file_id(db).edition(db);
             // Filter out private and unsafe functions
             if !it.is_visible_from(db, module)
-                || it.is_unsafe_to_call(db, None, Edition::CURRENT_FIXME)
+                || it.is_unsafe_to_call(db, None, edition)
                 || it.is_unstable(db)
             {
                 return None;
@@ -661,9 +662,10 @@ pub(super) fn impl_static_method<'a, DB: HirDatabase>(
                 return None;
             }
 
+            let edition = module.definition_source_file_id(db).edition(db);
             // Filter out private and unsafe functions
             if !it.is_visible_from(db, module)
-                || it.is_unsafe_to_call(db, None, Edition::CURRENT_FIXME)
+                || it.is_unsafe_to_call(db, None, edition)
                 || it.is_unstable(db)
             {
                 return None;
